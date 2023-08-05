@@ -1,0 +1,26 @@
+
+.freindlist{
+    grid-area: n;
+    border: 1px solid lightcyan;
+
+}
+
+.square{
+    width: 40px;
+    height: 40px;
+    background: cornflowerblue;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.friend{
+    float:left;
+    margin: 0 15px 15px 0;
+    text-align:center;
+    padding: 10px;
+}
+
+.friend:hover{
+    background: #ccc;
+}

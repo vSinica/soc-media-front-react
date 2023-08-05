@@ -1,0 +1,32 @@
+.postlist{
+    grid-area: c;
+    border: 1px solid lightcyan;
+    margin-left: 8%;
+    margin-right: 8%;
+    margin-top: 1%;
+}
+
+.h3label
+{
+    text-align: left;
+    margin-left: 8%;
+    margin-bottom: 1%;
+}
+
+.post{
+    border: 2px solid darkolivegreen;
+    margin-top: 3px;
+}
+
+.postTitle{
+    font-size: medium;
+    font-style: oblique;
+    margin-left: 7px;
+    text-align: left;
+}
+
+.postText{
+    font-size: small;
+    text-align: left;
+    margin-left: 7px;
+}

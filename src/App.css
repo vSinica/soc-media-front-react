@@ -1,6 +1,16 @@
 .App {
   text-align: center;
+  display: grid;
+
+  grid-template-areas:
+          "a a"
+          "n c";
+  grid-template-rows: auto;
+  grid-template-columns: 4fr 10fr;
+  /*grid-gap: 10px;*/
+
 }
+
 
 .App-logo {
   height: 40vmin;
