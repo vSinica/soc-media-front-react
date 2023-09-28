@@ -4,19 +4,24 @@ import PostList from "./components/post/PostList";
 import UserHeader from "./components/userheader/UserHeader"
 import axios from 'axios';
 import React, { useState, useEffect } from "react";
+import {useSelector, useDispatch} from 'react-redux';
+import {addToken} from './store/tokenStore';
+import {replacePosts} from './store/postsStore';
+import {replaceCurrentPageUser} from './store/currentPageUserStore';
+import {replaceFriends} from './store/friendStore';
 
 function App() {
 
-    const [token, setToken] = useState(null);
-    const [friendList, setFriendList] = useState([]);
-    const [postList, setPostList] = useState([]);
     const BASE_URL = 'http://localhost:8080';
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
     const [currentUser, setCurrentUser] = useState();
-    const [currentPageUser, setCurrentPageUser] = useState();
     const [fetchedCount, setFetchedCount] = useState(0);
+
+    const token = useSelector(state => state.tokenReducer.token);
+    const currentPageUser = useSelector(state => state.currentPageUserReducer.currentPageUser);
+    const dispatch = useDispatch();
 
 
     function fetchPosts(userId) {
@@ -26,23 +31,21 @@ function App() {
         };
         axios.get(`${BASE_URL}/api/users/`+userId+`/posts`, { headers })
             .then(response => {
-                setPostList(response.data);
+                dispatch(replacePosts(response.data));
                 setFetchedCount((prev) => prev + 1);
             })
             .catch(error => {
                 console.error(error);
             });
     };
-
+    
     function login() {
-
         axios.post(`${BASE_URL}/api/login`, {
             password: password,
             username: username
         })
             .then((response) => {
-                console.log(response.data);
-                setToken(response.data);
+                dispatch(addToken(response.data))
                 setIsLoggedIn(true);
             })
             .catch(error => {
@@ -51,25 +54,21 @@ function App() {
     };
 
     function fetchFriendList(userId) {
-        console.log('freind list id ' + userId);
-        console.log(currentUser);
-        console.log(currentPageUser);
         const headers = {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'text/plain'
         };
         axios.get(`${BASE_URL}/api/friend-requests/getFreindList/`+userId, { headers })
             .then(response => {
-                setFriendList(response.data);
+                dispatch(replaceFriends(response.data));
                 setFetchedCount((prev) => prev + 1);
-                console.log(response.data);
             })
             .catch(error => {
                 console.error(error);
             });
     }
 
-     async function fetchUser(userId = null) {
+    async function fetchUser(userId = null) {
         const headers = {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'text/plain'
@@ -85,7 +84,7 @@ function App() {
     function loadUserPage(id) {
         const fetchData = async () => {
             const response = await fetchUser(id);
-            await setCurrentPageUser(response);
+            await dispatch(replaceCurrentPageUser(response));
             console.log(currentPageUser);
         }
         fetchData();
@@ -113,36 +112,33 @@ function App() {
     }
 
     useEffect(() => {
-        if(token != null) {
+        if(token !== '') {
             const fetchData = async () => {
                 const response = await fetchUser();
+                await dispatch(replaceCurrentPageUser(response));
                 await setCurrentUser(response);
-                await setCurrentPageUser(response);
-                console.log(currentUser);
+
             }
             fetchData();
         }
     }, [token]);
 
     useEffect(() => {
-        if(currentPageUser !== undefined) {
-            console.log(currentPageUser);
+        if(currentPageUser) {
             fetchFriendList(currentPageUser.id);
             fetchPosts(currentPageUser.id);
         }
     },[currentUser])
 
- 
 
   return (
       <div>
           {isLoggedIn && fetchedCount>=3 ?
               (
                           <div className="App">
-                              <UserHeader currentUser={currentPageUser}
-                                          isHimOwnPage={JSON.stringify(currentUser) === JSON.stringify(currentPageUser)}/>
-                              <FreindList friends={friendList} loadFriendPage={loadUserPage} />
-                              <PostList posts={postList} putNewPost={putNewPost}
+                              <UserHeader isHimOwnPage={JSON.stringify(currentUser) === JSON.stringify(currentPageUser)}/>
+                              <FreindList loadFriendPage={loadUserPage} />
+                              <PostList putNewPost={putNewPost}
                                         isHimOwnPage={JSON.stringify(currentUser) === JSON.stringify(currentPageUser)}/>
                           </div>
               )
@@ -161,8 +157,11 @@ function App() {
                   <button onClick={login}>login</button>
               </div>)
           }
+
       </div>
   );
+
+
 }
 
 export default App;

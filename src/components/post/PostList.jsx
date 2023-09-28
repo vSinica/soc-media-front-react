@@ -1,15 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState } from 'react';
 import classes from "./PostList.module.css";
+import { useSelector } from 'react-redux';
+
 
 
 const PostList = (props) => {
-    const [posts, setPosts] = useState([]);
     const [title, setTitle] = useState([]);
     const [text, setText] = useState([]);
 
-    useEffect(() => {
-        setPosts(props.posts);
-    }, [props]);
+    const posts = useSelector(state => state.postsReducer.posts);
 
     return (
         <div>
